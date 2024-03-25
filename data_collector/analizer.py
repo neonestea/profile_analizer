@@ -4,13 +4,11 @@ from datetime import datetime
 from .custom_logger import configure_logger, set_stdout_handler
 from .result_builder import build_result
 import pandas as pd
-import operator
 import emoji
 from .tokenization import RegexTokenizer
 from .dostoevsky_models import FastTextSocialNetworkModel
 import nltk
 import string
-import pymorphy2
 import re
 
 from pymystem3 import Mystem

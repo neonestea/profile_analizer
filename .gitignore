@@ -13,6 +13,6 @@ main/migrations
 users/__pycache__
 users/migrations
 *.log
-
+sentiment_tool
 
 
