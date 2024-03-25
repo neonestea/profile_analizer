@@ -10,14 +10,19 @@ from .dostoevsky_models import FastTextSocialNetworkModel
 import nltk
 import string
 import re
+import pickle
 
 from pymystem3 import Mystem
+from category_encoders.hashing import HashingEncoder
 from string import punctuation
 from nltk.corpus import stopwords
 from autocorrect import Speller
 import gensim
 import gensim.corpora as corpora
 from gensim import models
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from catboost import CatBoostClassifier
 
 
 logger = configure_logger()
@@ -30,29 +35,187 @@ spell = Speller(lang="ru")
 russian_stopwords = stopwords.words("russian")
 '''stopwords'''
 
+open_classifier = pickle.load(open("C:\saved_models\open_classifier.pickle", "rb"))
+neur_classifier = pickle.load(open("C:\saved_models\\neur_classifier.pickle", "rb"))
+extr_classifier = pickle.load(open("C:\saved_models\extr_classifier.pickle", "rb"))
+agree_classifier = pickle.load(open("C:\saved_models\\agree_classifier.pickle", "rb"))
+cons_classifier = pickle.load(open("C:\saved_models\cons_classifier.pickle", "rb"))
+extr_tfidfconverter = pickle.load(open("C:\saved_models\extr_tf_idf.pickle", "rb"))
+open_tfidfconverter = pickle.load(open("C:\saved_models\open_tf_idf.pickle", "rb"))
+neur_tfidfconverter = pickle.load(open("C:\saved_models\\neur_tf_idf.pickle", "rb"))
+agree_tfidfconverter = pickle.load(open("C:\saved_models\\agree_tf_idf.pickle", "rb"))
+cons_vectorizer = pickle.load(open("C:\saved_models\cons_count_vectorizer.pickle", "rb"))
+cons_tfidfconverter = pickle.load(open("C:\saved_models\cons_tf_idf.pickle", "rb"))
 
-def preprocess(profiles):
-    pass
+def encode_with_hashing(x_df, trait):
+    """Classifies extraversion.
+    
+    :param x_df:      Input dataframe.
+    :type x_df:       DataFrame
+    :param trait:      Trait short name.
+    :type trait:       str
+
+    :return: Returns label
+    :rtype: int
+    """
+    country_encoder = pickle.load(open("C:\saved_models\\" + str(trait) +  "_country_encoder.pickle", "rb"))
+    city_encoder = pickle.load(open("C:\saved_models\\" + str(trait) +  "_city_encoder.pickle", "rb"))
+    university_name_encoder = pickle.load(open("C:\saved_models\\" + str(trait) +  "_university_name_encoder.pickle", "rb"))
+    faculty_encoder = pickle.load(open("C:\saved_models\\" + str(trait) +  "_faculty_encoder.pickle", "rb"))
+    home_town_encoder = pickle.load(open("C:\saved_models\\" + str(trait) +  "_home_town_encoder.pickle", "rb"))
+    countries = country_encoder.transform(x_df['country'])
+    countries = countries.rename(columns={'col_0': 'country0', 'col_1': 'country1', 'col_2': 'country2', 'col_3': 'country3', 'col_4': 'country4',
+                        'col_5': 'country5', 'col_6': 'country6', 'col_7': 'country7'})
+    city = city_encoder.transform(x_df['city'])
+    city = city.rename(columns={'col_0': 'city0', 'col_1': 'city1', 'col_2': 'city2', 'col_3': 'city3', 'col_4': 'city4',
+                        'col_5': 'city5', 'col_6': 'city6', 'col_7': 'city7'})
+
+    university_name = university_name_encoder.transform(x_df['university_name'])
+    university_name = university_name.rename(columns={'col_0': 'university_name0', 'col_1': 'university_name1', 'col_2': 'university_name2', 'col_3': 'university_name3', 'col_4': 'university_name4',
+                        'col_5': 'university_name5', 'col_6': 'university_name6', 'col_7': 'university_name7'})
+    faculty = faculty_encoder.transform(x_df['faculty'])
+    faculty = faculty.rename(columns={'col_0': 'faculty0', 'col_1': 'faculty1', 'col_2': 'faculty2', 'col_3': 'faculty3', 'col_4': 'faculty4',
+                        'col_5': 'faculty5', 'col_6': 'faculty6', 'col_7': 'faculty7'})
+
+    home_town = home_town_encoder.transform(x_df['home_town'])
+    home_town = home_town.rename(columns={'col_0': 'home_town0', 'col_1': 'home_town1', 'col_2': 'home_town2', 'col_3': 'home_town3', 'col_4': 'home_town4',
+                        'col_5': 'home_town5', 'col_6': 'home_town6', 'col_7': 'home_town7'})
+    
+    tmp_df = countries.join(city)
+    tmp_df = tmp_df.join(university_name)
+    tmp_df = tmp_df.join(faculty)
+    tmp_df = tmp_df.join(home_town)
+    x_df = tmp_df.join(x_df)
+    x_df = x_df.drop('country', axis = 1)
+    x_df = x_df.drop('city', axis = 1)
+    x_df = x_df.drop('home_town', axis = 1)
+    x_df = x_df.drop('faculty', axis = 1)
+    x_df = x_df.drop('university_name', axis = 1)
+    X = x_df.values
+    return X
+
+def get_open(df):
+    """Classifies oppenness.
+    
+    :param df:      Input dataframe.
+    :type df:       DataFrame
+
+    :return: Returns label
+    :rtype: int
+    """
+    df_texts = df[['full_texts']]
+    X = df_texts.values
+    #print(X.ravel())
+    
+    X = open_tfidfconverter.transform(X.ravel()).toarray()
+    tf_idf_df = pd.DataFrame(X)
+    x_df = df.join(tf_idf_df)
+    x_df = x_df.drop('full_texts', axis = 1)
+    #X = new_df.values
+    
+    X = encode_with_hashing(x_df, 'open') 
+    y = open_classifier.predict(X)
+    return int(y[0])
 
 
-def get_open(profile):
-    pass
+def get_neur(df):
+    """Classifies neurotism.
+    
+    :param df:      Input dataframe.
+    :type df:       DataFrame
+
+    :return: Returns label
+    :rtype: int
+    """
+    df_texts = df[['full_texts']]
+    X = df_texts.values
+    
+    #print(X.ravel())
+    
+    X = neur_tfidfconverter.transform(X.ravel()).toarray()
+    tf_idf_df = pd.DataFrame(X)
+    x_df = df.join(tf_idf_df)
+    x_df = x_df.drop('full_texts', axis = 1)
+    #X = new_df.values
+    
+    X = encode_with_hashing(x_df, 'neur')
+    y = neur_classifier.predict(X)
+    return int(y[0])
 
 
-def get_neur(profile):
-    pass
+def get_cons(df):
+    """Classifies cons.
+    
+    :param df:      Input dataframe.
+    :type df:       DataFrame
+
+    :return: Returns label
+    :rtype: int
+    """
+    df_texts = df[['full_texts']]
+    X = df_texts.values
+   
+    #print(X.ravel())
+    X = cons_vectorizer.transform(X.ravel())
+    #print(X)
+    X = cons_tfidfconverter.transform(X).toarray()
+    tf_idf_df = pd.DataFrame(X)
+    x_df = df.join(tf_idf_df)
+    x_df = x_df.drop('full_texts', axis = 1)
+    #X = new_df.values
+    
+    X = encode_with_hashing(x_df, 'cons')
+    y = cons_classifier.predict(X)
+    return int(y[0])
+
+def get_agree(df):
+    """Classifies agreeableness.
+    
+    :param df:      Input dataframe.
+    :type df:       DataFrame
+
+    :return: Returns label
+    :rtype: int
+    """
+    df_texts = df[['full_texts']]
+    X = df_texts.values
+    
+    #print(X.ravel())
+    
+    X = agree_tfidfconverter.transform(X.ravel()).toarray()
+    tf_idf_df = pd.DataFrame(X)
+    x_df = df.join(tf_idf_df)
+    x_df = x_df.drop('full_texts', axis = 1)
+    #X = new_df.values
+    
+    X = encode_with_hashing(x_df, 'agree')
+    y = agree_classifier.predict(X)
+    return int(y[0])
 
 
-def get_cons(profile):
-    pass
+def get_extr(df):
+    """Classifies extraversion.
+    
+    :param df:      Input dataframe.
+    :type df:       DataFrame
 
-
-def get_agree(profile):
-    pass
-
-
-def get_extr(profile):
-    pass
+    :return: Returns label
+    :rtype: int
+    """
+    df_texts = df[['full_texts']]
+    X = df_texts.values
+    
+    #print(X.ravel())
+    
+    X = extr_tfidfconverter.transform(X.ravel()).toarray()
+    tf_idf_df = pd.DataFrame(X)
+    x_df = df.join(tf_idf_df)
+    x_df = x_df.drop('full_texts', axis = 1)
+    #X = new_df.values
+    
+    X = encode_with_hashing(x_df, 'extr')
+    y = extr_classifier.predict(X)
+    return int(y[0])
 
 
 def create_line(profile):
@@ -460,8 +623,8 @@ def get_interests(profile):
 
     # print("Interests_data: ", interests_data)
     data_norm = [preprocess_text(t).split() for t in to_process]
-    lda_model = gensim.models.ldamodel.LdaModel.load("C:\LDA_model.model")
-    loaded_dict = corpora.Dictionary.load("C:\DictionaryInterests.sav")
+    lda_model = gensim.models.ldamodel.LdaModel.load("C:\saved_models\LDA_model.model")
+    loaded_dict = corpora.Dictionary.load("C:\saved_models\DictionaryInterests.sav")
     # print("data_norm: ", data_norm)
 
     for text in data_norm:
@@ -497,24 +660,29 @@ def analize(search):
         users_info = pd.DataFrame(line, index=[0])
         # users_info = users_info.append(line_df, ignore_index=True)
         users_info = preprocess_df(users_info)
-        print(users_info.columns)
-        print(users_info.values)
+        #print(users_info.columns)
+        #print(users_info.values)
 
         first_name = profiles[0].first_name
         last_name = profiles[0].last_name
         age = datetime.now().year - profiles[0].bdate
         city = profiles[0].city
         country = profiles[0].country
-        open = "NO"
-        cons = "NO"
-        neur = "NO"
-        agree = "NO"
-        extr = "NO"
+        open = "No" if get_open(users_info) == 0 else "Yes"
+        cons = "No" if get_cons(users_info) == 0 else "Yes"
+        neur = "No" if get_neur(users_info) == 0 else "Yes"
+        agree = "No" if get_agree(users_info) == 0 else "Yes"
+        extr = "No" if get_extr(users_info) == 0 else "Yes"
         interests = "NOT IMPLEMENTED"
 
         interests = set(get_interests(profiles[0]))
 
     else:
+        count_cons = 0
+        count_neur = 0
+        count_agree = 0
+        count_open = 0
+        count_extr = 0
         logger.debug("analize: many people")
         users_info = None
         full_interests = []
@@ -522,10 +690,25 @@ def analize(search):
             line = create_line(profile)
             users_info = pd.DataFrame(line, index=[0])
             users_info = preprocess_df(users_info)
-            print(users_info.columns)
-            print(users_info.values)
+            #print(users_info.columns)
+            #print(users_info.values)
             interests = get_interests(profile)
             full_interests.extend(interests)
+            cons = get_cons(users_info)
+            if cons == 1:
+                count_cons += 1
+            agree = get_agree(users_info)
+            if agree == 1:
+                count_agree += 1
+            neur = get_neur(users_info)
+            if neur == 1:
+                count_neur += 1
+            open = get_open(users_info)
+            if open == 1:
+                count_open += 1
+            extr = get_extr(users_info)
+            if extr == 1:
+                count_extr += 1
         full_interests = set(full_interests)
         count = len(profiles)
         first_name = "-"
@@ -537,16 +720,15 @@ def analize(search):
             age = str(min_age)
         else:
             age = str(min_age) + " - " + str(max_age)
-        # TODO traits and interests
         countries = set([el.country for el in profiles])
         cities = set([el.city for el in profiles])
         country = ", ".join(countries)
         city = ", ".join(cities)
-        open = "1%"
-        cons = "1%"
-        neur = "1%"
-        agree = "1%"
-        extr = "1%"
+        open = str(count_open / count) + "%"
+        cons = str(count_cons / count)+ "%"
+        neur = str(count_neur / count)+ "%"
+        agree = str(count_agree / count)+ "%"
+        extr = str(count_extr / count)+ "%"
         interests = full_interests
     build_result(
         search,

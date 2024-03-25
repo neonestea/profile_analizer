@@ -15,7 +15,6 @@
             </a>
             {% endfor %}
         <a href="{% url 'result' search.id %}" class="submit_link">Results</a>
-        <a href="{% url 'profile_info' search.id %}" class="submit_link">See Info</a>
         <a href="{% url 'search_update' search.id %}" class="submit_link">Rename</a>
         <a href="{% url 'search_delete' search.id %}" class="submit_link">Delete</a>
         <a href="{% url 'search_home' %}" class="cancel_btn">Cancel</a>
