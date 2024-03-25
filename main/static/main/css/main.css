@@ -1,0 +1,235 @@
+.container {
+    width: 100%;
+    display: column;
+    margin: 0px;
+}
+
+.logo_div {
+    width: 100%;
+    display: flex;
+    justify-content:space-evenly;
+    padding: 15px;
+    flex-grow: 2;
+}
+
+.logo {
+    border-radius: 15%;
+    width: 60%;
+}
+
+.my_header {
+    width: 100%;
+    background-color: white;
+    display: column;
+    justify-content: center;
+    text-transform: uppercase;
+}
+
+.nav_container {
+    display: flex;
+    justify-content: space-evenly;
+    color: black;
+    padding: 10px 0px;
+    background-color: rgb(90, 86, 86);
+}
+
+
+.nav_container a{
+    color: white;
+    text-decoration: none;
+    font-size: 100%;
+    
+}
+
+.nav_container a:hover{
+    color: rgb(147, 142, 142);
+}
+
+.nav_icon {
+    height: 10%;
+}
+
+.logo_and_auth {
+    display: flex;
+    justify-content: space-between;
+}
+
+.logo_and_auth a, p{
+    display: flex;
+    justify-content: center;
+    color: rgb(23, 68, 74);
+    text-decoration: none;
+    font-size: 80%;
+}
+html, body {
+    margin: 0px;
+    min-height: 100vh;
+    font: 1.2rem "Fira Sans", sans-serif;
+    list-style-type: none;
+}
+
+.auth {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 100%;
+    width:15%;
+}
+.auth a:hover{
+    color: rgb(147, 142, 142);
+}
+
+.my_page {
+    color: black;
+    padding: 5% 15%;
+    display: column;
+    text-align: center;
+    list-style-type: none;
+    background-color: white;
+
+}
+
+.my_page p {
+    color: rgb(23, 68, 74);
+    list-style-type: none;
+}
+
+.infos {
+    text-align: center;
+    color: black;
+}
+
+.my_page a {
+    color: black;
+}
+
+.submit_btn {
+    background-color: white;
+    color: black;
+    border: 2px solid #344c43; /* Green */
+    font-size: 20px;
+    text-decoration: none;
+    padding: 15px;
+    width: 120px; /* set the width value to your desired size */
+    height: 60px; /* set the height value to your desired size */
+    margin: 20px;
+    border-radius: 5px;
+    font: 1.2rem "Fira Sans", sans-serif;
+}
+
+.submit_btn:hover {
+    background-color: #344c43; /* Green */
+    color: white;
+  }
+
+  .submit_link {
+    background-color: white;
+    color: black;
+    border: 2px solid #344c43; /* Green */
+    font-size: 20px;
+    text-decoration: none;
+    padding: 15px;
+    width: 120px; /* set the width value to your desired size */
+    height: 40px; /* set the height value to your desired size */
+    margin: 20px;
+    border-radius: 5px;
+    font: 1.2rem "Fira Sans", sans-serif;
+}
+
+.submit_link:hover {
+    background-color: #344c43; /* Green */
+    color: white;
+  }
+
+
+  .cancel_btn {
+    background-color: white;
+    color: black;
+    border: 2px solid #604a4a; /* Green */
+    text-decoration: none;
+    padding: 15px;
+    width: 100px; /* set the width value to your desired size */
+    height: 40px; /* set the height value to your desired size */
+    margin: 20px;
+    border-radius: 5px;
+}
+
+.cancel_btn:hover {
+    background-color: #604a4a; /* Green */
+    color: white;
+  }
+
+
+.error {
+    padding: 10px;
+    color: red;
+    list-style-type: none;
+}
+
+.auth_form {
+    display: block;
+    text-align: center;
+    background-color: rgb(182, 182, 182, 0.2);
+    padding: 2%;
+}
+
+.auth_form ul, li {
+    list-style-type: none;
+}
+
+input {
+    background-color: white;
+    color: black;
+    border: 2px solid #b6b6b6; /* Green */
+    text-decoration: none;
+    padding: 10px;
+    margin: 20px;
+}
+
+small {
+    display: none;
+}
+
+.searches {
+    display: flex;
+    border: solid 2px rgb(182, 182, 182, 0.2);
+    align-content: space-around;
+    width: 100%;
+    flex-wrap: wrap;
+    text-decoration: none;
+    padding: 25px;
+    justify-content: center;
+    border-radius: 30px;
+    margin-top: 40px;
+}
+
+.searches a, h3{
+    text-decoration: none;
+}
+
+.one_search {
+    
+    padding: 0px 8px;
+    margin: 10px;
+    text-decoration: none;
+    background-color: white;
+    color: black;
+    border: 2px solid rgb(182, 182, 182, 0.4); /* Green */
+    border-radius: 15px;
+}
+
+.one_search h3{
+    
+    text-decoration: none;
+}
+
+.one_search h3:hover {
+    color: rgb(182, 182, 182, 0.7);
+}
+
+.link:hover {
+    background-color: rgb(182, 182, 182, 0.7);
+}
+
+.ready {
+    color: #344c43;
+}

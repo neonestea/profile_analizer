@@ -1,0 +1,15 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Delete search{% endblock %}    
+
+{% block content %}
+    <div class="my_page">
+        <h1>Are you sure you want to delete search?</h1>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="submit_btn">Delete</button>
+            <a href="{% url 'search_home' %}" class="cancel_btn">Cancel</a>
+        </form>
+        
+    </div>
+{% endblock %}    

@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+
+</head>
+<body>
+  <div class="container">
+    <div class="my_header">
+      <div class="logo_and_auth">
+        <div class="auth">
+          {% if user.is_authenticated %}
+          <p>Hello, {{ user.username }}!<p>
+            {% endif %}
+        </div>
+        <div class="logo_div">
+          <a href="{% url 'home' %}"><img src="{% static 'main/img/logo.PNG' %}" alt="Logo" class="logo"></a>
+        </div>
+        <div class="auth" onmousedown='return false;' onselectstart='return false;'>
+          {% if user.is_authenticated %}
+            <p><a class="auth_clickable" href="{% url 'logout' %}">Log Out</a></p>
+          {% else %}
+          <p><a class="auth_clickable" href="{% url 'login' %}">Log In</a></p>
+            <p><a class="auth_clickable" href="{% url 'register' %}">Register</a></p>
+          {% endif %}
+        </div>
+        
+      </div>
+        <div class="nav_container">
+          <div class="nav_el"><a href="{% url 'home' %}">Main</a></div>
+          <div class="nav_el"><a href="{% url 'about' %}">About</a></div>
+          {% if user.is_authenticated %}
+          <div class="nav_el"><a href="{% url 'search_home' %}">Search</a></div>
+          {% endif %}
+          <div class="nav_el"><a href="{% url 'contacts' %}">Contacts</a></div>
+      </div>
+    </div>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+  </div>
+</body>
+</html>

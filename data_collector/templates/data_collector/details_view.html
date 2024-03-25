@@ -1,0 +1,24 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}{{ search.name }}{% endblock %}    
+
+{% block content %}
+    <div class="my_page">
+        <h1>{{ search.name }}</h1>
+        <h3>Created: {{ search.date }}</h3>
+        <h3>Links:</h3>
+        {% for el in search.link_lines %}
+            <a href="{{ el }}" target="_blank" >
+                <div class="search_element">
+                    <h3>{{ el }}</h3>
+                </div>
+            </a>
+            {% endfor %}
+        <a href="{% url 'result' search.id %}" class="submit_link">Results</a>
+        <a href="{% url 'profile_info' search.id %}" class="submit_link">See Info</a>
+        <a href="{% url 'search_update' search.id %}" class="submit_link">Rename</a>
+        <a href="{% url 'search_delete' search.id %}" class="submit_link">Delete</a>
+        <a href="{% url 'search_home' %}" class="cancel_btn">Cancel</a>
+
+        </div>
+{% endblock %}    

@@ -1,0 +1,19 @@
+{% extends 'main/layout.html' %}
+{% block content %}      
+{% load crispy_forms_tags %} 
+<div class="my_page">
+  <h1>Login</h1>
+  <div class="auth_form">
+    
+    <form method="POST">
+      {% csrf_token %}
+      {{ login_form|crispy }}
+      <span class="error">{{ error }}</span>
+      <button type="submit" class="submit_btn">Login</button>
+      <a href="{% url 'home' %}" class="cancel_btn">Cancel</a>
+    </form>
+  </div>
+  <p class="text-center">Don't have an account? &nbsp;<a href="register"  class="link">Create an account</a>.</p>
+
+</div>
+{% endblock %}

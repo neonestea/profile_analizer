@@ -1,0 +1,29 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}{{ search.name }}{% endblock %}    
+
+{% block content %}
+    <div class="my_page" >
+        <h1>Results</h1>
+        <div >
+        {% if info %}
+                {% for el in info %}
+                    <p>First Name: {{ el.first_name }}</p>
+                    <p>Last Name: {{ el.last_name }}</p>
+                    <p>Age(s): {{ el.age }}</p>
+                    <p>Country(ies): {{ el.country }}</p>
+                    <p>City(ies): {{ el.city }}</p>
+                    <p>Openness: {{ el.open }}</p>
+                    <p>Agreeableness: {{ el.agree }}</p>
+                    <p>Extraversion: {{ el.extr }}</p>
+                    <p>Conscientiousness: {{ el.cons }}</p>
+                    <p>Neurotism: {{ el.neur }}</p>
+                    <p>Interests: {{ el.interests }}</p>
+                {% endfor %}
+            {% else %}
+                <p >Not ready yet. Please, try later</p>
+            {% endif %}
+        </div>
+        <a href="{% url 'search_detail' search.id %}" class="cancel_btn">Cancel</a>
+    </div>
+{% endblock %}    

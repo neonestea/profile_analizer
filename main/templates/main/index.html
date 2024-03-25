@@ -1,0 +1,39 @@
+{% extends 'main/layout.html' %}
+
+{% load static %}
+
+{% block title %}Main page{% endblock %}    
+
+{% block content %}
+    
+        
+<div class="my_page">
+            <h1>Profile Analyzer</h1>
+            <div class="infos">
+            <p>
+                Welcome to Profile Analyzer!
+            </p>
+                <p>Here you can search VK user(s) to see social portraits based on BigFive Personality Traits.</p>
+                <strong>Openess:</strong> imaginative, curious, open to new ideas<br>
+                <strong>Extraversion:</strong> outgoing, energetic, gregarious<br>
+                <strong>Agreebleness:</strong> warm, considerate, good-natured<br>
+                <strong>Conscientiousness:</strong> responsible, dependable, goal-oriented<br>
+                <strong>Neurotism:</strong> moody, tense, lower self-confidence<br>
+                <br>
+                <a href="https://www.verywellmind.com/the-big-five-personality-dimensions-2795422#:~:text=The%20Big%205%20personality%20traits,involves%20sadness%20or%20emotional%20instability" ><img src="{% static 'main/img/five.jpg' %}"  class="link" alt="Five" width="40%"></a>
+            </p>
+            {% if user.is_authenticated %}
+            <p>
+                Hello, {{ user.username }}!<br>
+                
+                To start your search go to Search tab to create a new search or explore you search history.
+            </p>
+            {% else %}
+            <p>
+                To work with searches you should &nbsp; <a href="/users/login" class="link"> Log In</a> &nbsp;or &nbsp;<a href="/users/register" class="link"> Register</a>!
+            </p>
+            {% endif %}
+        </div>
+        </div>  
+    
+{% endblock %}    

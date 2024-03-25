@@ -1,0 +1,54 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}{{ search.name }}{% endblock %}    
+
+{% block content %}
+    <div class="my_page" >
+        <h1>Info</h1>
+        <div >
+        {% if info %}
+                {% for el in info %}
+                    <p>First Name: {{ el.first_name }}</p>
+                    <p>Last Name: {{ el.last_name }}</p>
+                    <p>Country: {{ el.country }}</p>
+                    <p>City: {{ el.city }}</p>
+                    <p>Birth date: {{ el.bdate }}</p>
+                    <p>Interests: {{ el.interests }}</p>
+                    <p>Books: {{ el.books }}</p>
+                    <p>Tv: {{ el.tv }}</p>
+                    <p>Games: {{ el.games }}</p>
+                    <p>Movies: {{ el.movies }}</p>
+                    <p>Activities: {{ el.activities }}</p>
+                    <p>Music: {{ el.music }}</p>
+                    <p>Status: {{ el.status }}</p>
+                    <p>Military: {{ el.military }}</p>
+                    <p>University: {{ el.university_name }}</p>
+                    <p>Home town: {{ el.home_town }}</p>
+                    <p>Faculty: {{ el.faculty }}</p>
+                    <p>Relation: {{ el.relation }}</p>
+                    <p>Sex: {{ el.sex }}</p>
+                    <p>About: {{ el.about }}</p>
+                    <p>Friends count: {{ el.friends_count }}</p>
+                    <p>Followers count: {{ el.followers_count }}</p>
+                    <p>Groups: {{ el.groups }}</p>
+                    <p>Posts: {{ el.posts }}</p>
+                    <p>Comments: {{ el.comments }}</p>
+                    <p>Comments from others: {{ el.comments_of_other_users }}</p>
+                    <p>Alcohol: {{ el.alcohol }}</p>
+                    <p>Life main: {{ el.life_main }}</p>
+                    <p>People main: {{ el.people_main }}</p>
+                    <p>Political: {{ el.political }}</p>
+                    <p>Religion: {{ el.religion }}</p>
+                    <p>Smoking: {{ el.smoking }}</p>
+                    <p>Photos count: {{ el.photos_count }}</p>
+                    <p>Posts count: {{ el.posts_count }}</p>
+                
+
+                {% endfor %}
+            {% else %}
+                <p >Not ready yet. Please, try later</p>
+            {% endif %}
+        </div>
+        <a href="{% url 'search_detail' search.id %}" class="cancel_btn">Cancel</a>
+    </main>
+{% endblock %}    

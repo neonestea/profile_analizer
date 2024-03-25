@@ -1,0 +1,28 @@
+{% extends 'main/layout.html' %}
+{% block title %}Search profile{% endblock %}    
+
+{% block content %}
+<div class="my_page">
+        <h1>Searches</h1>
+        <a href="{% url 'create_search' %}" class="submit_link">New</a>
+        <div class="searches">
+            
+            {% if searches %}
+                {% for el in searches %}
+                <a href="{% url 'search_detail' el.id %}" >
+                    <div class="one_search" >
+                        <h3>{{ el }}</h3>
+                        {% if el.ready == 1 %}
+                            <p style="color:green">Ready</p>
+                        {% else %}
+                            <p style="color:grey">Processing</p>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            {% else %}
+                <p >You have no searches. Try to create <a href="{% url 'create_search' %}" >new search</a>.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}    

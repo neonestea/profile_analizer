@@ -1,0 +1,22 @@
+{% extends 'main/layout.html' %}
+
+{% block title %}Rename search{% endblock %}    
+
+{% block content %}
+    <div class="my_page" >
+        <h1>Rename search</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.name }}<br>
+            <div>
+                <span >{{ error }}</span>
+                <div>
+                    <button type="submit" class="submit_btn">Save</button>
+                    <a href="{% url 'search_home' %}" class="cancel_btn">Cancel</a>
+                </div>
+            </div>
+            
+        </form>
+        
+    </div>
+{% endblock %}    
