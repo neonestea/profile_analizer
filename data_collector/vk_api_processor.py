@@ -29,8 +29,13 @@ def start_collecting_info(search, links):
     """
     logger.debug("START start_collecting_info")
     links = [el.strip() for el in links.split("\n")]
+    users = []
     for link in links:
-        parse_profile(link, search)
+        users.extend(parse_profile(link, search))
+    logger.debug("users count = %s", len(users))
+    for user in users:
+        logger.debug("user = %s, link = %s", str(user[0]["id"]), user[1])
+        parse_profile_info(user[0], user[1], search)
     analize(search)
 
 
@@ -45,8 +50,9 @@ def parse_profile(url, search):
     """
     profile = check_user(url)
     logger.debug("START parse_profile")
+    result = []
     if profile is not None:
-        parse_profile_info(profile, url, search)
+        result.append([profile, url])
     else:
         profile = check_group(url)
         members = vk.groups.getMembers(group_id=profile["id"])
@@ -54,7 +60,8 @@ def parse_profile(url, search):
             usr_link = "https://vk.com/id" + str(member)
             logger.debug("Result link = %s", usr_link)
             member_profile = check_user(usr_link)
-            parse_profile_info(member_profile, usr_link, search)
+            result.append([member_profile, usr_link])
+    return result
 
 
 def parse_profile_info(profile, url, search):
@@ -129,10 +136,10 @@ def parse_profile_info(profile, url, search):
         profile["home_town"] if "home_town" in profile else "Не указано"
     )
     new_profile_info.relation = (
-        int(profile["relation"]) if "relation" in profile else "Не указано"
+        int(profile["relation"]) if "relation" in profile else "0"
     )
     # info['schools'] = profile['schools'] if 'schools' in profile else None
-    new_profile_info.sex = int(profile["sex"]) if "sex" in profile else "Не указано"
+    new_profile_info.sex = int(profile["sex"]) if "sex" in profile else "2.0"
     new_profile_info.about = profile["about"] if "about" in profile else "Не указано"
     # info['career'] = profile['career'] if 'career' in profile else None
     new_profile_info.country = (
@@ -144,8 +151,7 @@ def parse_profile_info(profile, url, search):
     # new_profile_info.timezone = profile['timezone'] if 'timezone' in profile else "Не указано"
     new_profile_info.friends_count = get_user_friends(profile_id)
     new_profile_info.followers_count = get_user_followers(profile_id)
-    new_profile_info.groups = get_user_groups(profile_id)[1]
-    new_profile_info.group_infos = get_user_groups(profile_id)[0]
+    new_profile_info.group_infos, new_profile_info.groups = get_user_groups(profile_id)
     (
         new_profile_info.posts,
         new_profile_info.comments,
@@ -270,11 +276,12 @@ def get_user_groups(user_id):
                     group_id=item, fields="description, activity, status"
                 )
                 # logger.debug("Group = %s", group)
+                st = group[0]["status"] if "status" in group[0] else ''
                 result += (
                     " "
                     + group[0]["description"]
                     + " "
-                    + group[0]["status"]
+                    + st
                     + " Activity: "
                     + group[0]["activity"]
                     + "==="

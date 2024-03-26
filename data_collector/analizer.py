@@ -46,6 +46,9 @@ neur_tfidfconverter = pickle.load(open("C:\saved_models\\neur_tf_idf.pickle", "r
 agree_tfidfconverter = pickle.load(open("C:\saved_models\\agree_tf_idf.pickle", "rb"))
 cons_vectorizer = pickle.load(open("C:\saved_models\cons_count_vectorizer.pickle", "rb"))
 cons_tfidfconverter = pickle.load(open("C:\saved_models\cons_tf_idf.pickle", "rb"))
+interests_tokenizer = RegexTokenizer()
+interests_model = FastTextSocialNetworkModel(tokenizer=interests_tokenizer)
+
 
 def encode_with_hashing(x_df, trait):
     """Classifies extraversion.
@@ -103,9 +106,11 @@ def get_open(df):
     :return: Returns label
     :rtype: int
     """
+    logger.debug("get_open: start")
     df_texts = df[['full_texts']]
     X = df_texts.values
     #print(X.ravel())
+    #print('open df ', df.shape)
     
     X = open_tfidfconverter.transform(X.ravel()).toarray()
     tf_idf_df = pd.DataFrame(X)
@@ -127,18 +132,25 @@ def get_neur(df):
     :return: Returns label
     :rtype: int
     """
+    logger.debug("get_neur: start")
     df_texts = df[['full_texts']]
     X = df_texts.values
-    
     #print(X.ravel())
     
     X = neur_tfidfconverter.transform(X.ravel()).toarray()
+    #print('after tfidf ', X.shape)
     tf_idf_df = pd.DataFrame(X)
+    #print('after tfidf ', tf_idf_df.shape)
+    #print('df ', df.columns)
     x_df = df.join(tf_idf_df)
+    #print('x_df ', x_df.shape)
     x_df = x_df.drop('full_texts', axis = 1)
-    #X = new_df.values
+    x_df = x_df.drop('political_10', axis = 1)
+    x_df = x_df.drop('sex_', axis = 1)
+    x_df = x_df.drop('military_', axis = 1)
     
-    X = encode_with_hashing(x_df, 'neur')
+    
+    X = encode_with_hashing(x_df, 'neur') 
     y = neur_classifier.predict(X)
     return int(y[0])
 
@@ -152,6 +164,7 @@ def get_cons(df):
     :return: Returns label
     :rtype: int
     """
+    logger.debug("get_cons: start")
     df_texts = df[['full_texts']]
     X = df_texts.values
    
@@ -177,6 +190,7 @@ def get_agree(df):
     :return: Returns label
     :rtype: int
     """
+    logger.debug("get_agree: start")
     df_texts = df[['full_texts']]
     X = df_texts.values
     
@@ -186,6 +200,9 @@ def get_agree(df):
     tf_idf_df = pd.DataFrame(X)
     x_df = df.join(tf_idf_df)
     x_df = x_df.drop('full_texts', axis = 1)
+    x_df = x_df.drop('political_10', axis = 1)
+    x_df = x_df.drop('sex_', axis = 1)
+    x_df = x_df.drop('military_', axis = 1)
     #X = new_df.values
     
     X = encode_with_hashing(x_df, 'agree')
@@ -202,6 +219,7 @@ def get_extr(df):
     :return: Returns label
     :rtype: int
     """
+    logger.debug("get_extr: start")
     df_texts = df[['full_texts']]
     X = df_texts.values
     
@@ -211,7 +229,9 @@ def get_extr(df):
     tf_idf_df = pd.DataFrame(X)
     x_df = df.join(tf_idf_df)
     x_df = x_df.drop('full_texts', axis = 1)
-    #X = new_df.values
+    x_df = x_df.drop('political_10', axis = 1)
+    x_df = x_df.drop('sex_', axis = 1)
+    x_df = x_df.drop('military_', axis = 1)
     
     X = encode_with_hashing(x_df, 'extr')
     y = extr_classifier.predict(X)
@@ -317,7 +337,7 @@ def create_line(profile):
     line["life_main_" + str(profile.life_main)] = 1
     line["people_main_" + str(profile.people_main)] = 1
     line["relation_" + str(profile.relation)] = 1
-    line["sex_" + str(profile.sex)] = 1
+    line["sex_" + str(profile.sex) + '.0'] = 1
     line["military_" + str(profile.military)] = 1
     line["political_" + str(profile.political)] = 1
     # print(line)
@@ -333,8 +353,7 @@ def count_sentiments(texts):
     :return: Returns count of sentiments
     :rtype: tuple
     """
-    tokenizer = RegexTokenizer()
-    model = FastTextSocialNetworkModel(tokenizer=tokenizer)
+    
 
     positive_count = 0
     negative_count = 0
@@ -342,7 +361,7 @@ def count_sentiments(texts):
     speech_count = 0
     uncertain_count = 0
     emojis = 0
-    results = model.predict(texts, k=2)
+    results = interests_model.predict(texts, k=2)
     for message, sentiment in zip(texts, results):
         emojis += emoji.emoji_count(message)
         v = list(sentiment.values())
@@ -532,6 +551,9 @@ def preprocess_df(new_df):
     df = df.drop("activities", axis=1)
     df = df.drop("music", axis=1)
     df = df.drop("about", axis=1)
+    df = df.drop("military", axis=1)
+    df = df.drop("relation", axis=1)
+    df = df.drop("sex", axis=1)
     df = df.replace("", 0)
     df = df.fillna(0)
     df["bdate"] = df["bdate"].astype("int64")
@@ -598,12 +620,13 @@ def get_interests(profile):
     :return: Returns interests.
     :rtype: list
     """
+    logger.debug("get_interests: start")
     interests_data = []
     to_process = []
     if len(profile.interests) != 0:
         to_process.append(profile.interests)
     if len(profile.books) != 0:
-        interests_data.append("КниГи")
+        interests_data.append("Книги")
     if len(profile.tv) != 0:
         interests_data.append("ТВ")
     if len(profile.games) != 0:
@@ -616,7 +639,8 @@ def get_interests(profile):
         descr_act = item.split("Activity: ")
         if len(descr_act) != 0 and len(descr_act[0]) != 0:
             activity = descr_act[1]
-            interests_data.append(activity)
+            if 'Данный материал заблокирован' not in activity:
+                interests_data.append(activity)
         if len(item) != 0:
 
             to_process.append(item)
@@ -639,7 +663,7 @@ def get_interests(profile):
                 topic_num = int(topic_num)
                 dominant_topic = int(topic_num)
         topic = get_topic_by_id(dominant_topic)
-        if len(topic) != 0:
+        if len(topic) != 0 and 'Данный материал':
 
             interests_data.append(topic)
 
@@ -665,7 +689,9 @@ def analize(search):
 
         first_name = profiles[0].first_name
         last_name = profiles[0].last_name
-        age = datetime.now().year - profiles[0].bdate
+        age = 'Не указано'
+        if str(profiles[0].bdate) != '0':
+            age = datetime.now().year - profiles[0].bdate
         city = profiles[0].city
         country = profiles[0].country
         open = "No" if get_open(users_info) == 0 else "Yes"
@@ -673,7 +699,6 @@ def analize(search):
         neur = "No" if get_neur(users_info) == 0 else "Yes"
         agree = "No" if get_agree(users_info) == 0 else "Yes"
         extr = "No" if get_extr(users_info) == 0 else "Yes"
-        interests = "NOT IMPLEMENTED"
 
         interests = set(get_interests(profiles[0]))
 
@@ -713,22 +738,25 @@ def analize(search):
         count = len(profiles)
         first_name = "-"
         last_name = "-"
-        ages = [datetime.now().year - int(el.bdate) for el in profiles]
-        min_age = min(ages)
-        max_age = max(ages)
-        if min_age == max_age:
-            age = str(min_age)
-        else:
-            age = str(min_age) + " - " + str(max_age)
+        ages_values = [int(el.bdate) for el in profiles if str(el.bdate) != '0']
+        ages = 'Не указано'
+        if len(ages_values) != 0:
+            ages = [datetime.now().year - el for el in ages_values]
+            min_age = min(ages)
+            max_age = max(ages)
+            if min_age == max_age:
+                age = str(min_age)
+            else:
+                age = str(min_age) + " - " + str(max_age)
         countries = set([el.country for el in profiles])
         cities = set([el.city for el in profiles])
         country = ", ".join(countries)
         city = ", ".join(cities)
-        open = str(count_open / count) + "%"
-        cons = str(count_cons / count)+ "%"
-        neur = str(count_neur / count)+ "%"
-        agree = str(count_agree / count)+ "%"
-        extr = str(count_extr / count)+ "%"
+        open = str((count_open / count) * 100) + "%"
+        cons = str((count_cons / count) * 100)+ "%"
+        neur = str((count_neur / count) * 100)+ "%"
+        agree = str((count_agree / count) * 100)+ "%"
+        extr = str((count_extr / count) * 100)+ "%"
         interests = full_interests
     build_result(
         search,

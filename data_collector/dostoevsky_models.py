@@ -48,7 +48,7 @@ class FastTextSocialNetworkModel(BaseModel):
 
     SENTENCE_LENGTH: Optional[int] = None
 
-    MODEL_PATH: str = "C:\\fasttext-social-network-model.bin"
+    MODEL_PATH: str = "C:\saved_models\\fasttext-social-network-model.bin"
 
     def __init__(
         self,
