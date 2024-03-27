@@ -27,6 +27,7 @@ def start_collecting_info(search, links):
     :type links:       str
 
     """
+
     logger.debug("START start_collecting_info")
     links = [el.strip() for el in links.split("\n")]
     users = []
@@ -270,6 +271,7 @@ def get_user_groups(user_id):
         groups = vk.users.getSubscriptions(user_id=user_id)
         groups = groups["groups"]["items"]
         groups_count = len(groups)
+        groups = groups[0:50]
         for item in groups:
             try:
                 group = vk.groups.getById(
@@ -277,13 +279,15 @@ def get_user_groups(user_id):
                 )
                 # logger.debug("Group = %s", group)
                 st = group[0]["status"] if "status" in group[0] else ''
+                descr = group[0]["description"] if "description" in group[0] else ''
+                act = group[0]["activity"] if "activity" in group[0] else ''
                 result += (
                     " "
-                    + group[0]["description"]
+                    + descr
                     + " "
                     + st
                     + " Activity: "
-                    + group[0]["activity"]
+                    + act
                     + "==="
                 )
 
@@ -343,7 +347,7 @@ def get_photo_comments(user_id):
         photos = vk.photos.getAll(owner_id=user_id, count=10)
     except vk_api.exceptions.ApiError:
         return user_comments, others_comments
-    logger.debug("Photos size = %s", photos["count"])
+    #logger.debug("Photos size = %s", photos["count"])
     for photo in photos["items"][:10]:
         comms = []
         try:
@@ -351,7 +355,7 @@ def get_photo_comments(user_id):
             comms = comms["items"]
         except vk_api.exceptions.ApiError:
             comms = comms
-        logger.debug("Comms size = %s", len(comms))
+        #logger.debug("Comms size = %s", len(comms))
         for com in comms:
             if len(com["text"]) != 0:
                 if str(com["from_id"]) == str(user_id):
@@ -403,7 +407,7 @@ def get_user_wall(user_id):
     except vk_api.exceptions.ApiError:
         return posts, user_comments, others_comments
 
-    logger.debug("wall size = %s", wall["count"])
+    #logger.debug("wall size = %s", wall["count"])
     for post in wall["items"][:10]:
         if len(post["text"]) != 0:
             posts.append(post["text"])
@@ -417,7 +421,7 @@ def get_user_wall(user_id):
         try:
             comms = vk.wall.getComments(owner_id=user_id, post_id=post["id"])
             comms = comms["items"]
-            logger.debug("comms size = %s", len(comms))
+            #logger.debug("comms size = %s", len(comms))
         except vk_api.exceptions.ApiError:
             # print("ERROR")
             comms = comms

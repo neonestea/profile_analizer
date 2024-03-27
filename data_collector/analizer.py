@@ -426,7 +426,10 @@ def add_count_sentiment_columns(df):
         # print(texts)
         # break
         full_text = " ".join(t for t in texts)
+        if len(full_text) == 0:
+            full_text = 'а'
         full_texts.append(full_text)
+
         # print(texts)
         # print(full_text)
 
@@ -487,6 +490,8 @@ def preprocess_text(text):
     ]
     # print(tokens)
     text = " ".join(tokens)
+    if len(text) == 0:
+        text = 'Не указано'
 
     return text
 
@@ -658,12 +663,12 @@ def get_interests(profile):
         dominant_topic = 0
         for j, (topic_num, topic_contrib) in enumerate(vector):
             if j == 0:  # => dominant topic
-                wp = lda_model.show_topic(topic_num)
-                topic_keywords = ", ".join([word for word, prop in wp])
-                topic_num = int(topic_num)
+                #wp = lda_model.show_topic(topic_num)
+                #topic_keywords = ", ".join([word for word, prop in wp])
+                #topic_num = int(topic_num)
                 dominant_topic = int(topic_num)
         topic = get_topic_by_id(dominant_topic)
-        if len(topic) != 0 and 'Данный материал':
+        if len(topic) != 0:
 
             interests_data.append(topic)
 
@@ -685,7 +690,7 @@ def analize(search):
         # users_info = users_info.append(line_df, ignore_index=True)
         users_info = preprocess_df(users_info)
         #print(users_info.columns)
-        #print(users_info.values)
+        print(users_info.values)
 
         first_name = profiles[0].first_name
         last_name = profiles[0].last_name

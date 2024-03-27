@@ -8,22 +8,55 @@
         <div >
         {% if info %}
                 {% for el in info %}
+                    {% if el.first_name != '-' %}
                     <p>First Name: {{ el.first_name }}</p>
                     <p>Last Name: {{ el.last_name }}</p>
+                    {% endif %}
                     <p>Age(s): {{ el.age }}</p>
                     <p>Country(ies): {{ el.country }}</p>
                     <p>City(ies): {{ el.city }}</p>
-                    <p>Openness: {{ el.open }}</p>
-                    <p>Agreeableness: {{ el.agree }}</p>
-                    <p>Extraversion: {{ el.extr }}</p>
-                    <p>Conscientiousness: {{ el.cons }}</p>
-                    <p>Neurotism: {{ el.neur }}</p>
-                    <p>Interests: {{ el.interests }}</p>
+                    {% if el.open != 'Yes' and el.open != 'No'%}
+                    <div style="display: flex; ">
+                        <div style="width: 30%; color: #344c43; font-size: 18px;">
+                            <div style="height: 32px; margin: 5px; padding: 3px;">Openess:</div>
+                            <div style="height: 32px; margin: 5px;">Agreeableness:</div>
+                            <div style="height: 32px; margin: 5px;">Extraversion:</div>
+                            <div style="height: 32px; margin: 5px;">Conscientiousness:</div>
+                            <div style="height: 32px; margin: 5px;">Neurotism:</div>
+                        </div>
+                        <div style="width: 70%;">
+                            <div style="width: 100%; border: 1px solid black; margin: 5px;">
+                                <div style="height: 30px;  background-color: #4CAF50; width: {{ el.open }};"> {{ el.open }}</div>
+                            </div>
+                            <div style="width: 100%; border: 1px solid black; margin: 5px;">
+                                <div style="height: 30px;  background-color: #4CAF50; width: {{ el.agree }};"> {{ el.agree }}</div>
+                            </div>
+                            <div style="width: 100%; border: 1px solid black; margin: 5px;">
+                                <div style="height: 30px;  background-color: #4CAF50; width: {{ el.extr }};"> {{ el.extr }}</div>
+                            </div>
+                            <div style="width: 100%; border: 1px solid black; margin: 5px;">
+                                <div style="height: 30px;  background-color: #4CAF50; width: {{ el.cons }};"> {{ el.cons }}</div>
+                            </div>
+                            <div style="width: 100%; border: 1px solid black; margin: 5px;">
+                                <div style="height: 30px;  background-color: #4CAF50; width: {{ el.neur }};"> {{ el.neur }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div><p>Interests: {{ el.interests }}</p></div>
+                    {% else %}
+                        <p>Openness: {{ el.open }}</p>
+                        <p>Agreeableness: {{ el.agree }}</p>
+                        <p>Extraversion: {{ el.extr }}</p>
+                        <p>Conscientiousness: {{ el.cons }}</p>
+                        <p>Neurotism: {{ el.neur }}</p>
+                        <p>Interests: {{ el.interests }}</p>
+                    {% endif %}
                 {% endfor %}
             {% else %}
                 <p >Not ready yet. Please, try later</p>
             {% endif %}
         </div>
+        <p></p>
         <a href="{% url 'search_detail' search.id %}" class="cancel_btn">Cancel</a>
     </div>
 {% endblock %}    

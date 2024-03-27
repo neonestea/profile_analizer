@@ -233,3 +233,10 @@ small {
 .ready {
     color: #344c43;
 }
+
+.progress_bar_container {
+    width: 50%;
+    background-color: #ddd;
+    border: 1px solid black;
+  }
+  
