@@ -109,14 +109,12 @@ def get_open(df):
     logger.debug("get_open: start")
     df_texts = df[['full_texts']]
     X = df_texts.values
-    #print(X.ravel())
-    #print('open df ', df.shape)
     
     X = open_tfidfconverter.transform(X.ravel()).toarray()
     tf_idf_df = pd.DataFrame(X)
+    #print(df.columns)
     x_df = df.join(tf_idf_df)
     x_df = x_df.drop('full_texts', axis = 1)
-    #X = new_df.values
     
     X = encode_with_hashing(x_df, 'open') 
     y = open_classifier.predict(X)
@@ -135,19 +133,14 @@ def get_neur(df):
     logger.debug("get_neur: start")
     df_texts = df[['full_texts']]
     X = df_texts.values
-    #print(X.ravel())
     
     X = neur_tfidfconverter.transform(X.ravel()).toarray()
-    #print('after tfidf ', X.shape)
     tf_idf_df = pd.DataFrame(X)
-    #print('after tfidf ', tf_idf_df.shape)
-    #print('df ', df.columns)
     x_df = df.join(tf_idf_df)
-    #print('x_df ', x_df.shape)
     x_df = x_df.drop('full_texts', axis = 1)
-    x_df = x_df.drop('political_10', axis = 1)
     x_df = x_df.drop('sex_', axis = 1)
     x_df = x_df.drop('military_', axis = 1)
+    x_df = x_df.drop('political_10', axis = 1)
     
     
     X = encode_with_hashing(x_df, 'neur') 
@@ -168,14 +161,14 @@ def get_cons(df):
     df_texts = df[['full_texts']]
     X = df_texts.values
    
-    #print(X.ravel())
     X = cons_vectorizer.transform(X.ravel())
-    #print(X)
     X = cons_tfidfconverter.transform(X).toarray()
     tf_idf_df = pd.DataFrame(X)
     x_df = df.join(tf_idf_df)
     x_df = x_df.drop('full_texts', axis = 1)
-    #X = new_df.values
+    x_df = x_df.drop('sex_', axis = 1)
+    x_df = x_df.drop('military_', axis = 1)
+    x_df = x_df.drop('political_10', axis = 1)
     
     X = encode_with_hashing(x_df, 'cons')
     y = cons_classifier.predict(X)
@@ -194,16 +187,15 @@ def get_agree(df):
     df_texts = df[['full_texts']]
     X = df_texts.values
     
-    #print(X.ravel())
     
     X = agree_tfidfconverter.transform(X.ravel()).toarray()
     tf_idf_df = pd.DataFrame(X)
     x_df = df.join(tf_idf_df)
     x_df = x_df.drop('full_texts', axis = 1)
-    x_df = x_df.drop('political_10', axis = 1)
     x_df = x_df.drop('sex_', axis = 1)
     x_df = x_df.drop('military_', axis = 1)
-    #X = new_df.values
+    x_df = x_df.drop('political_10', axis = 1)
+    x_df = x_df.drop('political_9', axis = 1)
     
     X = encode_with_hashing(x_df, 'agree')
     y = agree_classifier.predict(X)
@@ -223,15 +215,14 @@ def get_extr(df):
     df_texts = df[['full_texts']]
     X = df_texts.values
     
-    #print(X.ravel())
     
     X = extr_tfidfconverter.transform(X.ravel()).toarray()
     tf_idf_df = pd.DataFrame(X)
     x_df = df.join(tf_idf_df)
     x_df = x_df.drop('full_texts', axis = 1)
-    x_df = x_df.drop('political_10', axis = 1)
     x_df = x_df.drop('sex_', axis = 1)
     x_df = x_df.drop('military_', axis = 1)
+    x_df = x_df.drop('political_10', axis = 1)
     
     X = encode_with_hashing(x_df, 'extr')
     y = extr_classifier.predict(X)
@@ -338,9 +329,12 @@ def create_line(profile):
     line["people_main_" + str(profile.people_main)] = 1
     line["relation_" + str(profile.relation)] = 1
     line["sex_" + str(profile.sex) + '.0'] = 1
-    line["military_" + str(profile.military)] = 1
+    #line["military_" + str(profile.military)] = 1
     line["political_" + str(profile.political)] = 1
-    # print(line)
+    if str(profile.military) == '0':
+        line["military_False"] = 1
+    else:
+        line["military_True"] = 1
     return line
 
 
@@ -408,8 +402,6 @@ def add_count_sentiment_columns(df):
         # user_id = row['user_id']
         texts = row["comments"]
         texts = texts.split("', '")
-        # print(row['comments'].split('\,')[0])
-        # print(texts)
         texts.extend(row["posts"].split("', '"))
         texts.extend(row["comments_of_others"].split("', '"))
         texts.append(row["religion"])
@@ -423,15 +415,11 @@ def add_count_sentiment_columns(df):
         texts.append(row["music"])
         texts.append(row["about"])
 
-        # print(texts)
-        # break
         full_text = " ".join(t for t in texts)
         if len(full_text) == 0:
             full_text = 'а'
         full_texts.append(full_text)
 
-        # print(texts)
-        # print(full_text)
 
         (
             positive_count,
@@ -449,7 +437,6 @@ def add_count_sentiment_columns(df):
         uncertains.append(uncertain_count)
         emojis.append(emoji)
 
-    # print(len(positives))  #break
     result_df = result_df.assign(positives=positives)
     result_df = result_df.assign(negatives=negatives)
     result_df = result_df.assign(neutrals=neutrals)
@@ -472,8 +459,6 @@ def preprocess_text(text):
     mystem = Mystem()
     pattern_reply = "\[id[0-9]*\|[a-zA-Zа-я--Я]*\], "
     text = re.sub(pattern_reply, "", text)
-    # print(text)
-    # text = re.sub('[^a-zA-Zа-яА-Я]+ ', '', text)
 
     text = text.lower()
     text = text.translate(string.punctuation)
@@ -488,7 +473,7 @@ def preprocess_text(text):
         and "..." not in token
         and token.strip() not in punctuation
     ]
-    # print(tokens)
+
     text = " ".join(tokens)
     if len(text) == 0:
         text = 'Не указано'
@@ -512,10 +497,7 @@ def make_prepr(df):
         text = row["full_texts"]
         new_text = preprocess_text(text)
         new_texts.append(new_text)
-    # print(new_text)
-    # print(counter)
-    # break
-    # counter += 1
+
     result_df = result_df.assign(full_texts=new_texts)
     return result_df
 
@@ -532,9 +514,11 @@ def preprocess_df(new_df):
     df = new_df
     df = df.replace("Не указано", "")
     df = df.fillna("")
-    df.relation[df.relation == ""] = "0"
+    #df.relation[df.relation == ""] = "0"
+    df.loc[df["relation"] == "", "relation"] = "0"
     df["groups"] = df["groups"].astype("int64")
-    df.photos[df.photos == ""] = "0"
+    df.loc[df["photos"] == "", "photos"] = "0"
+    #df.photos[df.photos == ""] = "0"
 
     df["photos"] = df["photos"].astype("int64")
 
@@ -642,7 +626,7 @@ def get_interests(profile):
         interests_data.append("Музыка")
     for item in profile.group_infos.split("==="):
         descr_act = item.split("Activity: ")
-        if len(descr_act) != 0 and len(descr_act[0]) != 0:
+        if len(descr_act) == 2 and len(descr_act[0]) != 0:
             activity = descr_act[1]
             if 'Данный материал заблокирован' not in activity:
                 interests_data.append(activity)
@@ -650,11 +634,11 @@ def get_interests(profile):
 
             to_process.append(item)
 
-    # print("Interests_data: ", interests_data)
+
     data_norm = [preprocess_text(t).split() for t in to_process]
     lda_model = gensim.models.ldamodel.LdaModel.load("C:\saved_models\LDA_model.model")
     loaded_dict = corpora.Dictionary.load("C:\saved_models\DictionaryInterests.sav")
-    # print("data_norm: ", data_norm)
+
 
     for text in data_norm:
         query = [loaded_dict.doc2bow(text)]
@@ -689,8 +673,7 @@ def analize(search):
         users_info = pd.DataFrame(line, index=[0])
         # users_info = users_info.append(line_df, ignore_index=True)
         users_info = preprocess_df(users_info)
-        #print(users_info.columns)
-        print(users_info.values)
+    
 
         first_name = profiles[0].first_name
         last_name = profiles[0].last_name

@@ -4,19 +4,25 @@ from datetime import datetime
 from .models import ProfileInfo
 from .analizer import analize
 import uuid
+from itertools import cycle
 from .custom_logger import configure_logger, set_stdout_handler
 
-session = vk_api.VkApi(
-    token="vk1.a.Gi9VLR0O3w9yu6Mf30_rFTibl20zp6XMcjmn_sodhGHSH1tWW8_nYW9NZ9DavAhtQFnxA1sVeZ5b5754Rtzio8J8sDoCB6XFN4MX0QgbiN548Wc8xKFnqvv2Avqjb7O5xps2J8QSEpIwfR93NNq2aBKymo0KCdqiTSMXfKB36AT-x7xcnBjxTmvXxnaW4WVLniAlDvn2nVjDOCGcrjFS5Q"
-)
-'''vk api session'''
-vk = session.get_api()
-'''api'''
+tokens = ["vk1.a.Gi9VLR0O3w9yu6Mf30_rFTibl20zp6XMcjmn_sodhGHSH1tWW8_nYW9NZ9DavAhtQFnxA1sVeZ5b5754Rtzio8J8sDoCB6XFN4MX0QgbiN548Wc8xKFnqvv2Avqjb7O5xps2J8QSEpIwfR93NNq2aBKymo0KCdqiTSMXfKB36AT-x7xcnBjxTmvXxnaW4WVLniAlDvn2nVjDOCGcrjFS5Q",
+          "vk1.a.SHkM1RO4tKZGiRbtv4R6uAOPxETWdjdujyE57c3bBGHzGdW7aZJW4Ezj7NG72DV9Hq_B8QkqSyKnUMkpjC6x4pIvsI5cjm22KScyqdLtI-uJyNuyVzSFjib8gmBvxIXBYftt78zyh5RS_bmvk9q9JNEM5wcstCk24TczuJXVNifuQxRLJ4rAv3bwMK4C9IGKtKBAAjf_ZtM_Ww2D8pvmtw"]
+
 date_format = "%d.%m.%Y"
 '''date formatter'''
 logger = configure_logger()
 logger = set_stdout_handler(logger)
 
+token_generator = cycle('01')
+
+def get_vk(token_id):
+    session = vk_api.VkApi(
+        token=tokens[int(token_id)]
+    )
+    vk = session.get_api()
+    return vk
 
 def start_collecting_info(search, links):
     """Starts collecting info.
@@ -49,18 +55,19 @@ def parse_profile(url, search):
     :type search:       Search
 
     """
-    profile = check_user(url)
+    vk = get_vk(next(token_generator))
+    profile = check_user(url, vk)
     logger.debug("START parse_profile")
     result = []
     if profile is not None:
         result.append([profile, url])
     else:
-        profile = check_group(url)
+        profile = check_group(url, vk)
         members = vk.groups.getMembers(group_id=profile["id"])
         for member in members["items"]:
             usr_link = "https://vk.com/id" + str(member)
             logger.debug("Result link = %s", usr_link)
-            member_profile = check_user(usr_link)
+            member_profile = check_user(usr_link, vk)
             result.append([member_profile, usr_link])
     return result
 
@@ -76,6 +83,7 @@ def parse_profile_info(profile, url, search):
     :type search:       Search
 
     """
+    vk = get_vk(next(token_generator))
     logger.debug("START parse_profile_info")
     profile_id = str(profile["id"])
     new_profile_info = ProfileInfo()
@@ -122,8 +130,8 @@ def parse_profile_info(profile, url, search):
         profile["university_name"] if "university_name" in profile else "Не указано"
     )
     new_profile_info.faculty = "Не указано"
-    new_profile_info.posts_count = get_user_posts(profile_id)
-    new_profile_info.photos_count = get_user_photos(profile_id)
+    new_profile_info.posts_count = get_user_posts(profile_id, vk)
+    new_profile_info.photos_count = get_user_photos(profile_id, vk)
     if "university" in profile and "faculty" in profile:
         university_id = int(profile["university"])
         if university_id != 0:
@@ -150,14 +158,14 @@ def parse_profile_info(profile, url, search):
         profile["city"]["title"] if "city" in profile else "Не указано"
     )
     # new_profile_info.timezone = profile['timezone'] if 'timezone' in profile else "Не указано"
-    new_profile_info.friends_count = get_user_friends(profile_id)
-    new_profile_info.followers_count = get_user_followers(profile_id)
-    new_profile_info.group_infos, new_profile_info.groups = get_user_groups(profile_id)
+    new_profile_info.friends_count = get_user_friends(profile_id, vk)
+    new_profile_info.followers_count = get_user_followers(profile_id, vk)
+    new_profile_info.group_infos, new_profile_info.groups = get_user_groups(profile_id, vk)
     (
         new_profile_info.posts,
         new_profile_info.comments,
         new_profile_info.comments_of_other_users,
-    ) = get_all_user_comments(profile_id)
+    ) = get_all_user_comments(profile_id, vk)
     # new_profile_info.occupation = profile['occupation'] if 'occupation' in profile else "Не указано"
     if "personal" in profile:
         pers = profile["personal"]
@@ -184,7 +192,7 @@ def parse_profile_info(profile, url, search):
     new_profile_info.save()
 
 
-def check_user(url):
+def check_user(url, vk):
     """Gets user from VK API by url.
 
     :param url:      Input url.
@@ -193,6 +201,8 @@ def check_user(url):
     :return: Returns user from vk api.
     :rtype: dict
     """
+    if vk is None:
+        vk = get_vk(next(token_generator))
     token = url.split("/")[-1]
     profile = vk.users.get(
         user_ids=(token),
@@ -203,7 +213,7 @@ def check_user(url):
     return profile[0]
 
 
-def check_group(url):
+def check_group(url, vk):
     """Gets group from VK API by url.
 
     :param url:      Input url.
@@ -212,6 +222,8 @@ def check_group(url):
     :return: Returns group from vk api.
     :rtype: dict
     """
+    if vk is None:
+        vk = get_vk(next(token_generator))
     token = url.split("/")[-1]
     profile = vk.groups.getById(group_id=token)
     if len(profile) == 0:
@@ -219,7 +231,7 @@ def check_group(url):
     return profile[0]
 
 
-def get_user_posts(user_id):
+def get_user_posts(user_id, vk):
     """Gets number of posts of user.
 
     :param user_id:      Input user id.
@@ -237,7 +249,7 @@ def get_user_posts(user_id):
         return posts_count
 
 
-def get_user_photos(user_id):
+def get_user_photos(user_id, vk):
     """Gets number of user photos from VK API user id.
 
     :param user_id:      Input user id.
@@ -255,7 +267,7 @@ def get_user_photos(user_id):
         return photos_count
 
 
-def get_user_groups(user_id):
+def get_user_groups(user_id, vk):
     """Gets user groups and user_groups count from VK API user id.
 
     :param user_id:      Input user id.
@@ -299,7 +311,7 @@ def get_user_groups(user_id):
 
 
 
-def get_user_followers(user_id):
+def get_user_followers(user_id, vk):
     """Gets user followers count from VK API user id.
 
     :param user_id:      Input user id.
@@ -315,7 +327,7 @@ def get_user_followers(user_id):
         return 0
 
 
-def get_user_friends(user_id):
+def get_user_friends(user_id, vk):
     """Gets user friends count from VK API user id.
 
     :param user_id:      Input user id.
@@ -331,7 +343,7 @@ def get_user_friends(user_id):
         return 0
 
 
-def get_photo_comments(user_id):
+def get_photo_comments(user_id, vk):
     """Gets photo comments of user.
 
     :param user_id:      Input user id.
@@ -366,7 +378,7 @@ def get_photo_comments(user_id):
     return user_comments, others_comments
 
 
-def get_all_user_comments(user_id):
+def get_all_user_comments(user_id, vk):
     """Gets all comments per user.
 
     :param user_id:      Input user id.
@@ -376,9 +388,9 @@ def get_all_user_comments(user_id):
     :rtype: tuple
     """
     logger.debug("START get_all_user_comments")
-    all_comments, others_comments = get_photo_comments(user_id)
+    all_comments, others_comments = get_photo_comments(user_id, vk)
 
-    posts, usr_comms, oth_comms = get_user_wall(user_id)
+    posts, usr_comms, oth_comms = get_user_wall(user_id, vk)
     all_comments.extend(usr_comms)
     others_comments.extend(oth_comms)
     # for group in get_user_groups(user_id):
@@ -388,7 +400,7 @@ def get_all_user_comments(user_id):
     return posts, all_comments, others_comments
 
 
-def get_user_wall(user_id):
+def get_user_wall(user_id, vk):
     """Gets user wall.
 
     :param user_id:      Input user id.
