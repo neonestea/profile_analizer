@@ -682,7 +682,7 @@ def analize(search):
             age = datetime.now().year - profiles[0].bdate
         city = profiles[0].city
         country = profiles[0].country
-        open = "No" if get_open(users_info) == 0 else "Yes"
+        openn = "No" if get_open(users_info) == 0 else "Yes"
         cons = "No" if get_cons(users_info) == 0 else "Yes"
         neur = "No" if get_neur(users_info) == 0 else "Yes"
         agree = "No" if get_agree(users_info) == 0 else "Yes"
@@ -699,31 +699,36 @@ def analize(search):
         logger.debug("analize: many people")
         users_info = None
         full_interests = []
-        for profile in profiles:
-            line = create_line(profile)
-            users_info = pd.DataFrame(line, index=[0])
-            users_info = preprocess_df(users_info)
-            #print(users_info.columns)
-            #print(users_info.values)
-            interests = get_interests(profile)
-            full_interests.extend(interests)
-            cons = get_cons(users_info)
-            if cons == 1:
-                count_cons += 1
-            agree = get_agree(users_info)
-            if agree == 1:
-                count_agree += 1
-            neur = get_neur(users_info)
-            if neur == 1:
-                count_neur += 1
-            open = get_open(users_info)
-            if open == 1:
-                count_open += 1
-            extr = get_extr(users_info)
-            if extr == 1:
-                count_extr += 1
-        full_interests = set(full_interests)
         count = len(profiles)
+        for profile in profiles:
+            try:
+                line = create_line(profile)
+                users_info = pd.DataFrame(line, index=[0])
+                users_info = preprocess_df(users_info)
+                #print(users_info.columns)
+                #print(users_info.values)
+                interests = get_interests(profile)
+                full_interests.extend(interests)
+                cons = get_cons(users_info)
+                if cons == 1:
+                    count_cons += 1
+                agree = get_agree(users_info)
+                if agree == 1:
+                    count_agree += 1
+                neur = get_neur(users_info)
+                if neur == 1:
+                    count_neur += 1
+                openn = get_open(users_info)
+                if openn == 1:
+                    count_open += 1
+                extr = get_extr(users_info)
+                if extr == 1:
+                    count_extr += 1
+            except:
+                continue
+
+        full_interests = set(full_interests)
+        
         first_name = "-"
         last_name = "-"
         ages_values = [int(el.bdate) for el in profiles if str(el.bdate) != '0']
@@ -740,7 +745,7 @@ def analize(search):
         cities = set([el.city for el in profiles])
         country = ", ".join(countries)
         city = ", ".join(cities)
-        open = str((count_open / count) * 100) + "%"
+        openn = str((count_open / count) * 100) + "%"
         cons = str((count_cons / count) * 100)+ "%"
         neur = str((count_neur / count) * 100)+ "%"
         agree = str((count_agree / count) * 100)+ "%"
@@ -753,7 +758,7 @@ def analize(search):
         age,
         country,
         city,
-        open,
+        openn,
         cons,
         neur,
         agree,

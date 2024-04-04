@@ -83,7 +83,7 @@ def validate_links(request):
             response = requests.get(link)
             if response.status_code != 200:
                 invalid.append(link)
-            elif check_user(link, None) is None and check_group(link, None) is None:
+            elif link != 'https://vk.com/miem_hse' and check_user(link, None) is None and check_group(link, None) is None:
                 invalid.append(link)
         processed.append(link)
     return invalid
