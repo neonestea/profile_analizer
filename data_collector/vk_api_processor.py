@@ -8,10 +8,10 @@ from itertools import cycle
 from .custom_logger import configure_logger, set_stdout_handler
 from .miem_analizer import analize_miem
 
-tokens = ["vk1.a.Gi9VLR0O3w9yu6Mf30_rFTibl20zp6XMcjmn_sodhGHSH1tWW8_nYW9NZ9DavAhtQFnxA1sVeZ5b5754Rtzio8J8sDoCB6XFN4MX0QgbiN548Wc8xKFnqvv2Avqjb7O5xps2J8QSEpIwfR93NNq2aBKymo0KCdqiTSMXfKB36AT-x7xcnBjxTmvXxnaW4WVLniAlDvn2nVjDOCGcrjFS5Q",
-          "vk1.a.SHkM1RO4tKZGiRbtv4R6uAOPxETWdjdujyE57c3bBGHzGdW7aZJW4Ezj7NG72DV9Hq_B8QkqSyKnUMkpjC6x4pIvsI5cjm22KScyqdLtI-uJyNuyVzSFjib8gmBvxIXBYftt78zyh5RS_bmvk9q9JNEM5wcstCk24TczuJXVNifuQxRLJ4rAv3bwMK4C9IGKtKBAAjf_ZtM_Ww2D8pvmtw",
-          "vk1.a.mjn0zvM-WUOsVyHJ8aA45gkid0S15KqLJqf3wbd8V74HULnr-VTEFBeSeBLPmKH9mdu7meOwaTPlmQNKIbIVzLZovvSrL9D2eHrSUEMhu8B7oY3hs2ZZu6M2C1SYgujMRpvIkZ-w6LkId7OsB_hezjJzQgyD7EW4RUwktVFHe3holJ52YS402Z6atzCkJcsNlLjOt2FYGXUpD1D3V1MFcA",
-          "vk1.a.jHKTsvLm7ciQdTajttSEgo9jebxgrbAAqZE_s8uCdReQqd3h7_VKxtml8Ri0OOkkIhxb9FXlnP1jAjytmDYWwdFIfPERnBTgRs89-tu4TgIpSM8QYw7i1wcrxKAqXLKJdeeJkRYTEi7H24W48bV5QnnLCVRpKqenNK_bq6iY6lP2-gAKiUvKPZ3eDXGh4iVs3uABIRKqseDIx5gXOyj-8w"]
+tokens = ["TOKEN0",
+          "TOKEN1",
+          "TOKEN2",
+          "TOKEN3"]
 
 date_format = "%d.%m.%Y"
 '''date formatter'''
