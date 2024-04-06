@@ -41,7 +41,7 @@ def analize_miem(search):
     countries = df['country'].unique()
     country = ', '.join(countries)
     cities = df['city'].unique()
-    city = ', '.join(countries)
+    city = ', '.join(cities)
     openn = str(round(((count_open / count) * 100), 2)) + "%"
     cons =str( round(((count_cons / count) * 100), 2))+ "%"
     neur = str(round(((count_neur / count) * 100), 2))+ "%"
