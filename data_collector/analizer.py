@@ -745,11 +745,11 @@ def analize(search):
         cities = set([el.city for el in profiles])
         country = ", ".join(countries)
         city = ", ".join(cities)
-        openn = str((count_open / count) * 100) + "%"
-        cons = str((count_cons / count) * 100)+ "%"
-        neur = str((count_neur / count) * 100)+ "%"
-        agree = str((count_agree / count) * 100)+ "%"
-        extr = str((count_extr / count) * 100)+ "%"
+        openn = str(round(((count_open / count) * 100), 2)) + "%"
+        cons =str( round(((count_cons / count) * 100), 2))+ "%"
+        neur = str(round(((count_neur / count) * 100), 2))+ "%"
+        agree = str(round(((count_agree / count) * 100), 2))+ "%"
+        extr = str(round(((count_extr / count) * 100), 2))+ "%"
         interests = full_interests
     build_result(
         search,

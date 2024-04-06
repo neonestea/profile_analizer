@@ -9,7 +9,7 @@ logger = set_stdout_handler(logger)
 
 def analize_miem(search):
     
-    df = pd.read_pickle("C:\processed (2).pkl") 
+    df = pd.read_pickle("C:\processed (6).pkl") 
     #df = pd.read_pickle("C:\miem_preprocessed.pkl") 
     #df = prepare_df('C:\miem_preprocessed.csv')
     count = df.shape[0]
@@ -42,11 +42,11 @@ def analize_miem(search):
     country = ', '.join(countries)
     cities = df['city'].unique()
     city = ', '.join(countries)
-    openn = str((count_open / count) * 100) + "%"
-    cons = str((count_cons / count) * 100)+ "%"
-    neur = str((count_neur / count) * 100)+ "%"
-    agree = str((count_agree / count) * 100)+ "%"
-    extr = str((count_extr / count) * 100)+ "%"
+    openn = str(round(((count_open / count) * 100), 2)) + "%"
+    cons =str( round(((count_cons / count) * 100), 2))+ "%"
+    neur = str(round(((count_neur / count) * 100), 2))+ "%"
+    agree = str(round(((count_agree / count) * 100), 2))+ "%"
+    extr = str(round(((count_extr / count) * 100), 2))+ "%"
     df["age"] = df["age"].astype("int64")
     min_age = df[df["age"] != 0]["age"].min()
     max_age = df[df["age"] != 0]["age"].max()
