@@ -9,20 +9,20 @@
         {% if info %}
                 {% for el in info %}
                     {% if el.first_name != '-' %}
-                    <p>First Name: {{ el.first_name }}</p>
-                    <p>Last Name: {{ el.last_name }}</p>
+                    <p>Имя: {{ el.first_name }}</p>
+                    <p>Фамилия: {{ el.last_name }}</p>
                     {% endif %}
-                    <p>Age(s): {{ el.age }}</p>
-                    <p>Country(ies): {{ el.country }}</p>
-                    <p>City(ies): {{ el.city }}</p>
+                    <p>Возраст (разброс возрастов): {{ el.age }}</p>
+                    <p>Страна(-ы): {{ el.country }}</p>
+                    <p>Город(-а): {{ el.city }}</p>
                     {% if el.open != 'Yes' and el.open != 'No'%}
                     <div style="display: flex; ">
                         <div style="width: 30%; color: #344c43; font-size: 18px;">
-                            <div style="height: 32px; margin: 5px; padding: 3px;">Openess:</div>
-                            <div style="height: 32px; margin: 5px;">Agreeableness:</div>
-                            <div style="height: 32px; margin: 5px;">Extraversion:</div>
-                            <div style="height: 32px; margin: 5px;">Conscientiousness:</div>
-                            <div style="height: 32px; margin: 5px;">Neurotism:</div>
+                            <div style="height: 32px; margin: 5px; padding: 3px;">Открытость опыту:</div>
+                            <div style="height: 32px; margin: 5px;">Доброжелательность:</div>
+                            <div style="height: 32px; margin: 5px;">Экстраверсия:</div>
+                            <div style="height: 32px; margin: 5px;">Добросовестность:</div>
+                            <div style="height: 32px; margin: 5px;">Нейротизм:</div>
                         </div>
                         <div style="width: 70%;">
                             <div style="width: 100%; border: 1px solid black; margin: 5px;">
@@ -42,14 +42,14 @@
                             </div>
                         </div>
                     </div>
-                    <div><p>Interests: {{ el.interests }}</p></div>
+                    <div><p>Интересы: {{ el.interests }}</p></div>
                     {% else %}
-                        <p>Openness: {{ el.open }}</p>
-                        <p>Agreeableness: {{ el.agree }}</p>
-                        <p>Extraversion: {{ el.extr }}</p>
-                        <p>Conscientiousness: {{ el.cons }}</p>
-                        <p>Neurotism: {{ el.neur }}</p>
-                        <p>Interests: {{ el.interests }}</p>
+                        <p>Открытость опыту: {{ el.open }}</p>
+                        <p>Доброжелательность: {{ el.agree }}</p>
+                        <p>Экстраверсия: {{ el.extr }}</p>
+                        <p>Добросовестность: {{ el.cons }}</p>
+                        <p>Нейротизм: {{ el.neur }}</p>
+                        <p>Интересы: {{ el.interests }}</p>
                     {% endif %}
                 {% endfor %}
             {% else %}
