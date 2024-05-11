@@ -8,20 +8,10 @@ from itertools import cycle
 from .custom_logger import configure_logger, set_stdout_handler
 from .miem_analizer import analize_miem, analize_hse
 
-tokens = ["vk1.a.Gi9VLR0O3w9yu6Mf30_rFTibl20zp6XMcjmn_sodhGHSH1tWW8_nYW9NZ9DavAhtQFnxA1sVeZ5b5754Rtzio8J8sDoCB6XFN4MX0QgbiN548Wc8xKFnqvv2Avqjb7O5xps2J8QSEpIwfR93NNq2aBKymo0KCdqiTSMXfKB36AT-x7xcnBjxTmvXxnaW4WVLniAlDvn2nVjDOCGcrjFS5Q",
-          "vk1.a.SHkM1RO4tKZGiRbtv4R6uAOPxETWdjdujyE57c3bBGHzGdW7aZJW4Ezj7NG72DV9Hq_B8QkqSyKnUMkpjC6x4pIvsI5cjm22KScyqdLtI-uJyNuyVzSFjib8gmBvxIXBYftt78zyh5RS_bmvk9q9JNEM5wcstCk24TczuJXVNifuQxRLJ4rAv3bwMK4C9IGKtKBAAjf_ZtM_Ww2D8pvmtw",
-          "vk1.a.mjn0zvM-WUOsVyHJ8aA45gkid0S15KqLJqf3wbd8V74HULnr-VTEFBeSeBLPmKH9mdu7meOwaTPlmQNKIbIVzLZovvSrL9D2eHrSUEMhu8B7oY3hs2ZZu6M2C1SYgujMRpvIkZ-w6LkId7OsB_hezjJzQgyD7EW4RUwktVFHe3holJ52YS402Z6atzCkJcsNlLjOt2FYGXUpD1D3V1MFcA",
-          "vk1.a.jHKTsvLm7ciQdTajttSEgo9jebxgrbAAqZE_s8uCdReQqd3h7_VKxtml8Ri0OOkkIhxb9FXlnP1jAjytmDYWwdFIfPERnBTgRs89-tu4TgIpSM8QYw7i1wcrxKAqXLKJdeeJkRYTEi7H24W48bV5QnnLCVRpKqenNK_bq6iY6lP2-gAKiUvKPZ3eDXGh4iVs3uABIRKqseDIx5gXOyj-8w",
-          "vk1.a.aJn4eb1uyH-C0hJ7IuqXrx073o1qXFVKhPKSSEfZifAxN5YlhrRBcD0r39j32QPVBP7ulqD4DPEbtZiKgxWd5wEehAc_mVy8p46afRy9ycNZ94gERhVK4GVh-4BWm5k7A3zBE9P6V8qCs7S6nQNzRpeUjIRDpSknUopGJl4Gbif99Lt570SLDBcMvCp6qzR-AzxuKCKhzp7rhBnVo8RAqg",
-           "vk1.a.wpAN7WyXJBUq5nTVEUqLZI8eny2a0L4Cd0jYNr_Koz3WWO8ht_k4iqBtMNyQXOrLxOCB6I_GIRk3g01cCOZ7lHRhWBkUCW69wyD7bNWOEtEw1P6tFIUg9PDP-LyX2y3zUM29II1tcSHbUuD5PmU6PMWIThAIW55gt_cTZYPZ7n4eUWBNhF8zxvkM7lkJSXVR-C3rkm-p644EXpGWTy50WA",
-          "vk1.a.yDE-OjfcSSDPy-ovSyf9N-cZ_fZ0vNQeWxrrCJMJqCyhuhqg5f64HujMPp2vk9IbaQUuRTEgmLxKVYBf5bSo7d01yMu1x9mJr-DoGqH065uKYa_8agULxnqqgCgWJJZU17D73nAsrXdTLN15Ubsxq_wrFTUYEB-LGgQd9vvZ_EZOX6jGuQ1w8fBFr4-pPuTpSbo3K92WrZUM4evHPZAzQA",
-          "vk1.a.Ew9XE3EQnaXQlbT-Tbo5Ixftn1QE_Qi-bMIGHOo_B_mZXNS7XCFsO6oaLhpb2OJjkU94yZgDIyy06nQtMuDdUzfq8vUDDg1aw_FwyklLFlOiAdh3LVrpYkGj28Pm8T58v2z16uinvov69Ol74rlKmtEx4oCusyUpoaN4bgfgoo6q0xkbnU7UmptsypoO2dIQovEcuRYs8Aiobo0UPleAyQ",
-          "vk1.a.jfP5NvCrPDx7-D8Fvsb_LCNWPewnNGI6zyqhYyEUXS-blhxIcOJsCRsa5YUf7mTgQv66Bw14Hy6EYJ5YnTmR2vBDOok51Gq-J15f37gRPTeWhwPQ9OHs7S3LRRf5B7VVlUerMqK1JIK-lDIY0SdkWZi0MrVMeyHkhsBXW38-pFdT0joIGP3BnQGbGDm4IGejISoKBHaBLP7CTNAb3qKY5Q",
-          "vk1.a.Q6EuNqsoEe59ZtktqqzfpImhaIuf2kj730mVhUvxK4O35kqSsHLKJZ6ZoKRZvwr6cMG5Gfq9eWj-c5b3eSPW5l7_LcwXCXvG-FHBL46FzBZ_cKc5ZdeujArOmhlj-9wla2qYW4obv12mEubBdRDcqTwn01v_pjYjgpdI3zpFHRlY73vtr5aiidVJCKDMHECHkLV49xz-dt55Cesyeq9pzw",
-          "vk1.a.bmKitblvmAvBQ2OYOHAarznvFqmQesdsnQNX46kANRCai-R0rhtQL7zweVnee-sS2WtxEa8zu3CPew7x-_ngliHmwuP1xbtkZ3-z8HU7uveEpTMwvvrOGmzm4RSP3E4p8RgKN7q8FEPHfBpGB_-JB13qLGJSbmNCtkbDvDuA0kurScOZXlECn_uxELN8TWFygDx_2B1BifiS8-1K5brj5Q",
-          "vk1.a.dXI7QcLnmkSkLwznB-eEHZbzTg1wzIYAWy_VuZ4Vr9dXuWUg8GOQVOeTWhWGHcO7w4Genki87IomXLmdogN2LDP_hsyqtdWfQuPJubXY1wKdBUb0RhysyeMQGeLBJ-1vS8dmtYwO-H2JXWm-7-3Mrijc5Rl1zhhZYo5pKj7-NN7awxqteQ9yHV9q6yV-MrDNGaIn8Yvxmd0l1Pbu9wUiXQ",
-          "vk1.a.C8DYqSo60FhslAOzgV4UN1y9QyCXGrQyGr2jZMdUHpwYQ94sa8qfJ7WnaNMxQwUVQOM55ZGS_2DHJy4GIyn9jPDeeY3atjuF2VQ8JXp0OcOjodErtT7_9lHUYMej1nRohIkdLfAnN64uBLRf4g54w8EBRJ8v2RqnK3bP_Ku6eOtq_PY4e5qnQaFx4QzepJPW3NavgbUPW5ozi52i5Y14YA"
-          ]
+tokens = ["TOKEN0",
+          "TOKEN1",
+          "TOKEN2",
+          "TOKEN3"]
 
 date_format = "%d.%m.%Y"
 '''date formatter'''
